@@ -75,6 +75,27 @@ gradient optimization algorithms. \emph{Uses shared memory.}
 		\end{itemize}
 	\end{frame}
 	
+	\begin{frame}{Primal-dual subgradient methods}
+		\begin{itemize}
+			\item Objective function $f(x)$ is non-smooth and not necessarily differentiable.
+			\item Classic: $\min_x\{f(x):x \in \mathbb{R}^n\} : x_{k+1} = x_k - \alpha_k g_k$
+			\item Convergence and reach: $\alpha_k \rightarrow 0, \sum_k \alpha_k = \infty.$	
+			\item Lower linear model of the objective function:
+			\[ l_k(x) \overset{def}{=} \sum_{i=0}^k \alpha_i(f(x_i) + \langle g_i, x-x_i \rangle) / \sum_{i=0}^k  \alpha_i \]
+			\item New subgradients are added with \emph{decreasing} weights, needed for convergence
+				of primal sequence $\{x_k\}$; but they are more important.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Primal-dual subgradient methods}
+		\begin{itemize}
+			\item Insight: maintain two different sequences of parameters.
+			\item One is responsible for the primal space process and has a vanishing sequence of steps.
+			\item The other is in the dual space of linear function and has a non-decreasing sequence of 
+				weights to prioritize newer subgradients.
+		\end{itemize}
+	\end{frame}	
+	
 	\section{Contribution}
 	\begin{frame}{The Paper's Experimental Results}
 		\begin{itemize}
@@ -125,10 +146,8 @@ gradient optimization algorithms. \emph{Uses shared memory.}
 	\end{frame}
 	
 	\begin{frame}{Convergence of a 16-node Cycle vs. 16-node Grid}
-		\centerline{\includegraphics[width=0.75\textwidth]{grid-vs-cycle-ll-per-node.png}}
-		Unexpected result: with the same weighting of the local data, convergence
-		speed is almost identical even though the grid graph is twice as strongly 
-		connected.
+		\centerline{\includegraphics[width=\textwidth]{grid-vs-cycle-ll-per-node.png}}
+		As connectivity improves, convergence speeds up: cycle graph iterations = 744, grid graph iterations = 383.
 	\end{frame}
 	
 	\begin{frame}{Random Geometric Graph: Density}
@@ -142,8 +161,27 @@ gradient optimization algorithms. \emph{Uses shared memory.}
 		outweigh the (quadratic) growth of area covered by the nodes of the graph.
 	\end{frame}	
 	
-			
-	\subsection{Evaluation}
+	\begin{frame}{Kernel SVM experiment}
+		\begin{itemize}
+			\item Implement a kernelized SVM dual descent algorithm (``optimal soft margin linear classifier without offset'' 
+			from HW2) on MNIST 4/9 8x8 dataset.
+			\item Use kernel $@(a,b)(a' * b + 1)$ - fast but shows decent benchmark results with SMO.
+			\item Inhomogenous polynomial kernel works well in a no-constant-term framework.
+			\item The optimization problem is the SVM dual:\[f(\alpha) = \frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy^{(i)}y^{(j)}K(x^{(i)}, x^{(j)}) + \sum_i\alpha_i\]
+			\item Optimal solution for $z$:\[z_i = \frac{1 - \frac{1}{2}\sum_{i \not = j}\alpha_jy^{(i)}y^{(j)}K(x^{(i)}, x^{(j)})}{K(x^{(i)}, x^{(i)})}\]
+		\end{itemize}
+	\end{frame}
+				
+	\begin{frame}{Kernel SVM results}
+		\begin{itemize}
+			\item After 500 iterations with $C = 1000$, $num\_sv = 1107$ and $test\_error = 0.064$.
+			\item SMO result on the same kernel and C (normal / constant term framework): 0.045 with 234 SV.
+			\item Conclusion: likely to be an implementation bug (the projection is now a constrained
+				minimization problem, unlike logistic regression, since $0 \leq \alpha_i \leq \frac{C}{n})$.
+			\item Dual averaging is only efficient when the projection from dual to primal space $ \Pi$ can
+				be efficiently computed.
+		\end{itemize}
+	\end{frame}
 	
 	\section{Conclusions}
 	\begin{frame}{Conclusions: Tunable Parameters}
@@ -156,6 +194,15 @@ gradient optimization algorithms. \emph{Uses shared memory.}
 			corollaries for different graph types.
 		\end{itemize}			
 	\end{frame}
+	
+	\begin{frame}{Conclusions: SVM}
+		\begin{itemize}
+			\item	Computing the projection is a more complicated task with a constrained problem and
+				is likely an iterative optimization run in its own right.
+			\item The goal of distributed computation in this case is not clear (what is the meaning of
+				averaging of $\alpha_i$'s?)
+		\end{itemize}			
+	\end{frame}	
 	
 	\begin{frame}{Questions from the Audience}
 		The Matlab code used to produce the output for this presentation and the presentation itself
