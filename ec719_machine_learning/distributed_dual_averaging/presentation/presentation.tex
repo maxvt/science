@@ -15,6 +15,12 @@
 		\titlepage
 	\end{frame}
 	
+	\begin{frame}{The Paper}
+		Agarwal, Alekh, Martin J. Wainwright, and John C. Duchi. 
+		"\href{http://web.stanford.edu/~jduchi/projects/DuchiAgWa10_nips.pdf}{Distributed dual averaging in networks.}" 
+		In Advances in Neural Information Processing Systems, pp. 550-558. 2010.		
+	\end{frame}
+	
 	\begin{frame}{Outline}
 		\tableofcontents
 	\end{frame}
@@ -125,7 +131,38 @@ gradient optimization algorithms. \emph{Uses shared memory.}
 		connected.
 	\end{frame}
 	
+	\begin{frame}{Random Geometric Graph: Density}
+		\centerline{\includegraphics[width=\textwidth]{density_vs_conv.png}}
+		As expected, strong connectivity improves convergence speed.
+	\end{frame}	
+
+	\begin{frame}{Random Geometric Graph: Size (10-80 nodes)}
+		\centerline{\includegraphics[width=\textwidth]{size_vs_conv.png}}
+		The opposite result was expected; it looks like the effects of stronger connectivity
+		outweigh the (quadratic) growth of area covered by the nodes of the graph.
+	\end{frame}	
+	
+			
 	\subsection{Evaluation}
 	
 	\section{Conclusions}
+	\begin{frame}{Conclusions: Tunable Parameters}
+		\begin{itemize}
+			\item	The details of the doubly stochastic graph matrix (for example, how much weight to 
+			assign to the local node?) influence convergence speed significantly but are not discussed.
+			\item Step choice $\alpha(t)$ and convergence rate: with the suggested formula
+			\[\alpha(t) = \frac{R\sqrt{1-\sigma_2(P)}}{4L\sqrt{t}}\]
+			the convergence was extremely slow. Therefore we were unable to test the convergence
+			corollaries for different graph types.
+		\end{itemize}			
+	\end{frame}
+	
+	\begin{frame}{Questions from the Audience}
+		The Matlab code used to produce the output for this presentation and the presentation itself
+		can be found on GitHub:
+		
+		\begin{block}{}
+		\url{https://github.com/maxvt/science/tree/master/ec719_machine_learning/distributed_dual_averaging}
+		\end{block}
+	\end{frame}
 \end{document}
